@@ -199,7 +199,6 @@ def delegate_docker(args, exclude, require, integration_targets):
     :type integration_targets: tuple[IntegrationTarget]
     """
     test_image = args.docker
-    privileged = args.docker_privileged
 
     if isinstance(args, ShellConfig):
         use_httptester = args.httptester
@@ -255,9 +254,13 @@ def delegate_docker(args, exclude, require, integration_targets):
 
             test_options = [
                 '--detach',
-                '--volume', '/sys/fs/cgroup:/sys/fs/cgroup:ro',
-                '--privileged=%s' % str(privileged).lower(),
             ]
+
+            if args.docker_privileged:
+                test_options.extend([
+                '--volume', '/sys/fs/cgroup:/sys/fs/cgroup:ro',
+                '--privileged=%s' % str(args.docker_privileged).lower(),
+                ])
 
             if args.docker_memory:
                 test_options.extend([
